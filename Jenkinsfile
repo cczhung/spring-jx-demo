@@ -3,9 +3,11 @@ pipeline {
     label "jenkins-maven"
   }
   environment {
-    ORG = 'zzchung'
+    ORG = 'jenkens_test'
     APP_NAME = 'demo'
     CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
+    registry = "docker_hub_account/repository_name"
+    registryCredential = 'registry_hand'
   }
   stages {
     stage('CI Build and push snapshot') {
