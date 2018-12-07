@@ -1,0 +1,2 @@
+env:
+    test: "the env variable in yml"
