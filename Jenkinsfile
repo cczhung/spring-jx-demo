@@ -20,9 +20,9 @@ pipeline {
       steps {
         container('maven') {
           sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
+          sh "docker login $DOCKER_REGISTRY -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PWD"
           sh "mvn install"
           sh "export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml"
-          sh "docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PWD"
           sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:$PREVIEW_VERSION"
           dir('charts/preview') {
             sh "make preview"
@@ -48,7 +48,7 @@ pipeline {
           sh "mvn versions:set -DnewVersion=\$(cat VERSION)"
           sh "jx step tag --version \$(cat VERSION)"
           sh "mvn clean deploy"
-          sh "docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PWD"
+          sh "docker login $DOCKER_REGISTRY -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PWD"
           sh "export VERSION=`cat VERSION` && skaffold build -f skaffold.yaml"
           sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat VERSION)"
         }
