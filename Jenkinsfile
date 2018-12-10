@@ -59,7 +59,7 @@ pipeline {
       }
       steps {
         container('maven') {
-          dir('charts/demo') {
+          dir('charts/spring-jx-demo') {
             sh "jx step changelog --version v\$(cat ../../VERSION)"
 
             // release the helm chart
