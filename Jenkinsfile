@@ -6,8 +6,6 @@ pipeline {
     ORG = 'jenkens_test'
     APP_NAME = 'demo'
     CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
-    registry = "docker_hub_account/repository_name"
-    registryCredential = 'registry_hand'
   }
   stages {
     stage('CI Build and push snapshot') {
@@ -24,6 +22,7 @@ pipeline {
           sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
           sh "mvn install"
           sh "export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml"
+          sh "docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PWD"
           sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:$PREVIEW_VERSION"
           dir('charts/preview') {
             sh "make preview"
@@ -49,6 +48,7 @@ pipeline {
           sh "mvn versions:set -DnewVersion=\$(cat VERSION)"
           sh "jx step tag --version \$(cat VERSION)"
           sh "mvn clean deploy"
+          sh "docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PWD"
           sh "export VERSION=`cat VERSION` && skaffold build -f skaffold.yaml"
           sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat VERSION)"
         }
